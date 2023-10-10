@@ -11,7 +11,7 @@ async function bootstrap() {
     dotenv_1.default.config();
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
-        origin: ['http://localhost:3000'],
+        origin: ['http://localhost:3000', 'https://kns-support.vercel.app'],
         methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS', 'PATCH'],
         credentials: true,
         exposedHeaders: ['Authorization'],
