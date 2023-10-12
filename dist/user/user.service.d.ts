@@ -6,8 +6,5 @@ export declare class UserService {
     User({ Id }: Prisma.UsersWhereUniqueInput): Promise<Users | null>;
     Login({ Email }: Prisma.UsersWhereUniqueInput): Promise<Users | null>;
     SignUP(data: Prisma.UsersCreateInput): Promise<Users | null>;
-    updateUser(params: {
-        where: Prisma.UsersWhereUniqueInput;
-        data: Prisma.UsersUpdateInput;
-    }): Promise<Users>;
+    updateUser(Id: string, data: Prisma.UsersUpdateInput): Promise<Users>;
 }

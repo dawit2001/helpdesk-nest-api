@@ -14,9 +14,7 @@ let JWTGuard = exports.JWTGuard = class JWTGuard extends (0, passport_1.AuthGuar
         return super.canActivate(context);
     }
     handleRequest(err, user, info) {
-        console.log('come on man');
         if (err || !user) {
-            console.log('come on man this is stupid');
             throw err || new common_1.UnauthorizedException();
         }
         return user;

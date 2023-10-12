@@ -15,24 +15,36 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.UserController = void 0;
 const common_1 = require("@nestjs/common");
 const user_service_1 = require("./user.service");
-const prisma_service_1 = require("../prisma/prisma.service");
 const user_dto_1 = require("./user.dto");
 let UserController = exports.UserController = class UserController {
-    constructor(UserService, PrismaService) {
+    constructor(UserService) {
         this.UserService = UserService;
     }
-    async updateProfile(updateUserDto) { }
+    async updateProfile(userId, updateUserDto) {
+        const user = await this.UserService.updateUser(userId, updateUserDto);
+        const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, } = user;
+        return {
+            Id,
+            FullName,
+            Email,
+            UserName,
+            Image,
+            UserType,
+            WorkingPhone,
+            MobilePhone,
+        };
+    }
 };
 __decorate([
-    (0, common_1.Post)('update/:id'),
+    (0, common_1.Put)('update/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.UpdateUserDto]),
+    __metadata("design:paramtypes", [String, user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateProfile", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
-    __metadata("design:paramtypes", [user_service_1.UserService,
-        prisma_service_1.PrismaService])
+    __metadata("design:paramtypes", [user_service_1.UserService])
 ], UserController);
 //# sourceMappingURL=user.controller.js.map

@@ -25,7 +25,7 @@ let UserService = exports.UserService = class UserService {
         return user;
     }
     async Login({ Email }) {
-        const user = this.Prisma.users.findUnique({
+        const user = await this.Prisma.users.findUnique({
             where: {
                 Email,
             },
@@ -35,19 +35,17 @@ let UserService = exports.UserService = class UserService {
         return user;
     }
     async SignUP(data) {
-        const user = this.Prisma.users.create({
+        const user = await this.Prisma.users.create({
             data: data,
         });
         return user;
     }
-    async updateUser(params) {
-        const user = this.Prisma.users.update({
-            where: params.where,
-            data: params.data,
+    async updateUser(Id, data) {
+        const profile = await this.Prisma.users.update({
+            where: { Id },
+            data: data,
         });
-        if (!user)
-            return null;
-        return user;
+        return profile;
     }
 };
 exports.UserService = UserService = __decorate([

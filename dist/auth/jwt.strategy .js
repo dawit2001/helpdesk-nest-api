@@ -25,7 +25,6 @@ let JwtStrategy = exports.JwtStrategy = JwtStrategy_1 = class JwtStrategy extend
         });
     }
     static extractJWTFromCookie(req) {
-        console.log(req.cookies.access_token);
         if (req.cookies['access_token']) {
             return req.cookies['access_token'];
         }

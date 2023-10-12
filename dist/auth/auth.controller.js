@@ -51,7 +51,7 @@ let AuthController = exports.AuthController = class AuthController {
 };
 __decorate([
     (0, common_1.Post)('signup'),
-    __param(0, (0, common_1.Request)()),
+    __param(0, (0, common_1.Body)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [user_dto_1.SignUpDto]),
     __metadata("design:returntype", Promise)
