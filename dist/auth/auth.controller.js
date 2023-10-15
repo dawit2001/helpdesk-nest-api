@@ -15,29 +15,37 @@ Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
-const user_dto_1 = require("../user/user.dto");
 const auth_guard_1 = require("./auth.guard");
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService) {
         this.authService = authService;
+        this.setAccessTokenCookie = (res, AccessToken) => {
+            res.cookie('access_token', AccessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+                path: '/',
+            });
+        };
     }
-    async signup(signupDto) {
-        const { Id, FullName, UserName, Image, WorkingPhone, MobilePhone } = await this.authService.SignUp(signupDto);
-        return { Id, FullName, UserName, Image, WorkingPhone, MobilePhone };
+    async signup(req, res) {
+        const AccessToken = await this.authService.SignUp(req.body);
+        res.clearCookie('access_token');
+        this.setAccessTokenCookie(res, AccessToken);
+        res.send('successfully registerd');
     }
-    async signin(signin) {
-        return this.authService.SignIn(signin);
+    async signin(req, res) {
+        const AccessToken = await this.authService.SignIn(req.body);
+        res.clearCookie('access_token');
+        this.setAccessTokenCookie(res, AccessToken);
+        res.send('successfully loggedin');
     }
     async signinwithGoogle(req, res) {
         const AccessToken = await this.authService.signInWithGoogle(req.body);
-        res
-            .cookie('access_token', AccessToken, {
-            httpOnly: true,
-            secure: true,
-            sameSite: 'none',
-            expires: new Date(Date.now() + 1 * 24 * 60 * 1000),
-        })
-            .send({ status: 'ok' });
+        res.clearCookie('access_token');
+        this.setAccessTokenCookie(res, AccessToken);
+        res.send({ status: 'ok' });
     }
     async signout(res) {
         res.clearCookie('access_token');
@@ -51,16 +59,18 @@ let AuthController = exports.AuthController = class AuthController {
 };
 __decorate([
     (0, common_1.Post)('signup'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.SignUpDto]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signup", null);
 __decorate([
     (0, common_1.Post)('login'),
-    __param(0, (0, common_1.Body)()),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [user_dto_1.SignInDto]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signin", null);
 __decorate([

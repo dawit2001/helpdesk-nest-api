@@ -6,23 +6,9 @@ export declare class AuthService {
     readonly UserService: UserService;
     constructor(JWTService: JwtService, UserService: UserService);
     generateToken(payload: any): Promise<string>;
-    SignIn({ Email, Password }: SignInDto): Promise<{
-        AccessToken: string;
-    }>;
+    SignIn({ Email, Password }: SignInDto): Promise<string>;
     private validatePassword;
-    SignUp(signUpDto: SignUpDto): Promise<{
-        Id: string;
-        FullName: string;
-        UserName: string;
-        Email: string;
-        Password: string;
-        Image: string;
-        UserType: string;
-        About: string;
-        CreatedDate: Date;
-        WorkingPhone: string;
-        MobilePhone: string;
-    }>;
+    SignUp(signUpDto: SignUpDto): Promise<string>;
     signInWithGoogle(signupDto: SignUpDto): Promise<string>;
     UserProfile({ userId }: any): Promise<{
         Id: string;

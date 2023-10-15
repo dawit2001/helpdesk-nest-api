@@ -22,6 +22,24 @@ let UserController = exports.UserController = class UserController {
     }
     async updateProfile(userId, updateUserDto) {
         const user = await this.UserService.updateUser(userId, updateUserDto);
+        console.log(user);
+        if (user) {
+            const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, } = user;
+            return {
+                Id,
+                FullName,
+                Email,
+                UserName,
+                Image,
+                UserType,
+                WorkingPhone,
+                MobilePhone,
+            };
+        }
+    }
+    async updatePassword(userId, UpdatePassword) {
+        console.log(UpdatePassword);
+        const user = await this.UserService.updatePassword(userId, UpdatePassword);
         const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, } = user;
         return {
             Id,
@@ -43,6 +61,14 @@ __decorate([
     __metadata("design:paramtypes", [String, user_dto_1.UpdateUserDto]),
     __metadata("design:returntype", Promise)
 ], UserController.prototype, "updateProfile", null);
+__decorate([
+    (0, common_1.Put)('updatePassword/:id'),
+    __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, user_dto_1.UpdatePasswordDto]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "updatePassword", null);
 exports.UserController = UserController = __decorate([
     (0, common_1.Controller)('user'),
     __metadata("design:paramtypes", [user_service_1.UserService])
