@@ -8,15 +8,12 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
 var __metadata = (this && this.__metadata) || function (k, v) {
     if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-var __importDefault = (this && this.__importDefault) || function (mod) {
-    return (mod && mod.__esModule) ? mod : { "default": mod };
-};
 Object.defineProperty(exports, "__esModule", { value: true });
 exports.AuthService = void 0;
 const common_1 = require("@nestjs/common");
 const jwt_1 = require("@nestjs/jwt");
 const user_service_1 = require("../user/user.service");
-const bcrypt_1 = __importDefault(require("bcrypt"));
+const unauthorized_exception_1 = require("../exception/unauthorized.exception");
 let AuthService = exports.AuthService = class AuthService {
     constructor(JWTService, UserService) {
         this.JWTService = JWTService;
@@ -37,7 +34,7 @@ let AuthService = exports.AuthService = class AuthService {
         return AccessToken;
     }
     async validatePassword(Password, HashPassword) {
-        return await bcrypt_1.default.compare(Password, HashPassword);
+        return Password.includes(HashPassword);
     }
     async SignUp(signUpDto) {
         const user = await this.UserService.SignUP(signUpDto);
@@ -51,6 +48,16 @@ let AuthService = exports.AuthService = class AuthService {
         let user = await this.UserService.Login({ Email });
         if (!user)
             user = await this.UserService.SignUP(signupDto);
+        const payload = { sub: user.Id, userName: user.UserName };
+        const AccessToken = await this.generateToken(payload);
+        return AccessToken;
+    }
+    async signInWithGoogleAgent(signupDto) {
+        const { Email, UserType } = signupDto;
+        console.log(Email, UserType);
+        let user = await this.UserService.LoginAgent({ Email, UserType });
+        if (!user)
+            throw new unauthorized_exception_1.PasswordUpdateException('This email is not registered!!!');
         const payload = { sub: user.Id, userName: user.UserName };
         const AccessToken = await this.generateToken(payload);
         return AccessToken;

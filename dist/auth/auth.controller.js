@@ -47,14 +47,29 @@ let AuthController = exports.AuthController = class AuthController {
         this.setAccessTokenCookie(res, AccessToken);
         res.send({ status: 'ok' });
     }
+    async signinwithGoogleAgent(req, res) {
+        const AccessToken = await this.authService.signInWithGoogleAgent(req.body);
+        res.clearCookie('access_token');
+        this.setAccessTokenCookie(res, AccessToken);
+        res.send({ status: 'ok' });
+    }
     async signout(res) {
         res.clearCookie('access_token');
         res.send('user logged out');
     }
     async getProfile(req) {
         const { userId } = req.user;
-        const { Id, FullName, Email, UserName, Image, WorkingPhone, MobilePhone } = await this.authService.UserProfile({ userId });
-        return { Id, FullName, Email, UserName, Image, WorkingPhone, MobilePhone };
+        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, } = await this.authService.UserProfile({ userId });
+        return {
+            Id,
+            FullName,
+            Email,
+            UserName,
+            UserType,
+            Image,
+            WorkingPhone,
+            MobilePhone,
+        };
     }
 };
 __decorate([
@@ -81,6 +96,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signinwithGoogle", null);
+__decorate([
+    (0, common_1.Post)('googleAuth/agent'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "signinwithGoogleAgent", null);
 __decorate([
     (0, common_1.Get)('signout'),
     __param(0, (0, common_1.Res)({ passthrough: true })),

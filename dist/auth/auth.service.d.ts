@@ -10,6 +10,7 @@ export declare class AuthService {
     private validatePassword;
     SignUp(signUpDto: SignUpDto): Promise<string>;
     signInWithGoogle(signupDto: SignUpDto): Promise<string>;
+    signInWithGoogleAgent(signupDto: SignUpDto): Promise<string>;
     UserProfile({ userId }: any): Promise<{
         Id: string;
         FullName: string;
