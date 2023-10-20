@@ -9,7 +9,6 @@ const app_module_1 = require("./app.module");
 const dotenv_1 = __importDefault(require("dotenv"));
 async function bootstrap() {
     dotenv_1.default.config();
-    console.log(process.env.JWT_SECRET_KEY);
     const app = await core_1.NestFactory.create(app_module_1.AppModule);
     app.enableCors({
         origin: ['http://localhost:3000', 'https://kns-support.vercel.app'],

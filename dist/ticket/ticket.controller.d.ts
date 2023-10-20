@@ -3,7 +3,7 @@ import { AttachmentDto, newTicketDto } from './Ticket.dto';
 export declare class TicketController {
     private readonly TicketService;
     constructor(TicketService: TicketService);
-    getTickets(userId: string): Promise<{
+    getTicket(TicketId: string): Promise<{
         Id: string;
         Type: string;
         Priority: string;
@@ -12,7 +12,20 @@ export declare class TicketController {
         UserId: string;
         CreatedAt: Date;
         UpdatedAt: Date;
-    }[]>;
+    }>;
+    getTickets(userId: string, offset: string, limit: string): Promise<{
+        Ticket: {
+            Id: string;
+            Type: string;
+            Priority: string;
+            Subject: string;
+            Content: string;
+            UserId: string;
+            CreatedAt: Date;
+            UpdatedAt: Date;
+        }[];
+        count: number;
+    }>;
     newTicket(newTicketDto: newTicketDto): Promise<{
         Id: string;
         IssueType: string;
@@ -23,6 +36,16 @@ export declare class TicketController {
         CreatedAt: Date;
         UpdatedAt: Date;
     }>;
+    fetchAttachment(attachId: string): Promise<{
+        Id: string;
+        FileName: string;
+        FilePath: string;
+        Size: import("@prisma/client/runtime/library").Decimal;
+        Mimi_Type: string;
+        TicketId: string;
+        Createdat: Date;
+        CreatedBy: string;
+    }[]>;
     fetchAttachments(): Promise<{
         Id: string;
         FileName: string;
@@ -42,5 +65,15 @@ export declare class TicketController {
         TicketId: string;
         Createdat: Date;
         CreatedBy: string;
+    }>;
+    DeleteTicket(TicketId: string): Promise<{
+        Id: string;
+        Type: string;
+        Priority: string;
+        Subject: string;
+        Content: string;
+        UserId: string;
+        CreatedAt: Date;
+        UpdatedAt: Date;
     }>;
 }

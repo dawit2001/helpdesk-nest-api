@@ -3,8 +3,14 @@ import { PrismaService } from 'src/prisma/prisma.service';
 export declare class TicketService {
     private readonly prisma;
     constructor(prisma: PrismaService);
-    getUserTickets(Id: string): Promise<Tickets[] | null>;
+    getTicket(Id: string): Promise<Tickets | null>;
+    getUserTickets(Id: string, offset: number, limit: number): Promise<{
+        Tickets: Tickets[];
+        count: number;
+    } | null>;
     newTicket(data: Prisma.TicketsCreateInput): Promise<Tickets>;
+    fetchSingleAttachment(Id: string): Promise<Attachement[] | null>;
     fetchAttachment(): Promise<Attachement[]>;
     newAttachment(data: Prisma.AttachementCreateInput): Promise<Attachement>;
+    deleteTicket(Id: string): Promise<Tickets>;
 }

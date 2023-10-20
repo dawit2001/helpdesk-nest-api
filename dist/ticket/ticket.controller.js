@@ -20,12 +20,10 @@ let TicketController = exports.TicketController = class TicketController {
     constructor(TicketService) {
         this.TicketService = TicketService;
     }
-    async getTickets(userId) {
-        console.log(userId);
-        const Tickets = await this.TicketService.getUserTickets(userId);
-        console.log(Tickets);
-        return Tickets.map((ticket) => {
-            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = ticket;
+    async getTicket(TicketId) {
+        const Ticket = await this.TicketService.getTicket(TicketId);
+        if (Ticket) {
+            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = Ticket;
             return {
                 Id,
                 Type,
@@ -36,7 +34,26 @@ let TicketController = exports.TicketController = class TicketController {
                 CreatedAt,
                 UpdatedAt,
             };
+        }
+        return null;
+    }
+    async getTickets(userId, offset, limit) {
+        const { Tickets, count } = await this.TicketService.getUserTickets(userId, parseInt(offset), parseInt(limit));
+        const Ticket = Tickets.map((ticket) => {
+            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = ticket;
+            const tickets = {
+                Id,
+                Type,
+                Priority,
+                Subject,
+                Content,
+                UserId,
+                CreatedAt,
+                UpdatedAt,
+            };
+            return tickets;
         });
+        return { Ticket, count };
     }
     async newTicket(newTicketDto) {
         const Ticket = await this.TicketService.newTicket(newTicketDto);
@@ -51,6 +68,22 @@ let TicketController = exports.TicketController = class TicketController {
             CreatedAt,
             UpdatedAt,
         };
+    }
+    async fetchAttachment(attachId) {
+        const attachement = await this.TicketService.fetchSingleAttachment(attachId);
+        return attachement.map((attach) => {
+            const { Id, FileName, FilePath, Size, Mimi_Type, TicketId, Createdat, CreatedBy, } = attach;
+            return {
+                Id,
+                FileName,
+                FilePath,
+                Size,
+                Mimi_Type,
+                TicketId,
+                Createdat,
+                CreatedBy,
+            };
+        });
     }
     async fetchAttachments() {
         const attachement = await this.TicketService.fetchAttachment();
@@ -82,12 +115,38 @@ let TicketController = exports.TicketController = class TicketController {
             CreatedBy,
         };
     }
+    async DeleteTicket(TicketId) {
+        const Ticket = await this.TicketService.deleteTicket(TicketId);
+        if (Ticket) {
+            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = Ticket;
+            return {
+                Id,
+                Type,
+                Priority,
+                Subject,
+                Content,
+                UserId,
+                CreatedAt,
+                UpdatedAt,
+            };
+        }
+        return null;
+    }
 };
+__decorate([
+    (0, common_1.Get)(':Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "getTicket", null);
 __decorate([
     (0, common_1.Get)('/user/:id'),
     __param(0, (0, common_1.Param)('id')),
+    __param(1, (0, common_1.Query)('offset')),
+    __param(2, (0, common_1.Query)('limit')),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [String]),
+    __metadata("design:paramtypes", [String, String, String]),
     __metadata("design:returntype", Promise)
 ], TicketController.prototype, "getTickets", null);
 __decorate([
@@ -97,6 +156,13 @@ __decorate([
     __metadata("design:paramtypes", [Ticket_dto_1.newTicketDto]),
     __metadata("design:returntype", Promise)
 ], TicketController.prototype, "newTicket", null);
+__decorate([
+    (0, common_1.Get)('attachment/:Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "fetchAttachment", null);
 __decorate([
     (0, common_1.Get)('attachment'),
     __metadata("design:type", Function),
@@ -110,6 +176,13 @@ __decorate([
     __metadata("design:paramtypes", [Ticket_dto_1.AttachmentDto]),
     __metadata("design:returntype", Promise)
 ], TicketController.prototype, "newAttachment", null);
+__decorate([
+    (0, common_1.Delete)(':Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "DeleteTicket", null);
 exports.TicketController = TicketController = __decorate([
     (0, common_1.Controller)('ticket'),
     __metadata("design:paramtypes", [ticket_service_1.TicketService])

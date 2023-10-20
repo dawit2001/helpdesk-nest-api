@@ -16,27 +16,46 @@ let TicketService = exports.TicketService = class TicketService {
     constructor(prisma) {
         this.prisma = prisma;
     }
-    async getUserTickets(Id) {
-        console.log(Id);
+    async getTicket(Id) {
+        return await this.prisma.tickets.findUnique({
+            where: {
+                Id,
+            },
+        });
+    }
+    async getUserTickets(Id, offset, limit) {
         const Tickets = await this.prisma.tickets.findMany({
             where: {
                 UserId: Id,
             },
+            skip: offset,
+            take: limit,
             orderBy: {
                 CreatedAt: 'desc',
             },
         });
-        if (!Tickets) {
+        const count = await this.prisma.tickets.count({
+            where: {
+                UserId: Id,
+            },
+        });
+        if (!Tickets && count === 0) {
             return null;
         }
-        return Tickets;
+        return { Tickets, count };
     }
     async newTicket(data) {
         const Ticket = await this.prisma.tickets.create({
             data,
         });
-        console.log(Ticket);
         return Ticket;
+    }
+    async fetchSingleAttachment(Id) {
+        return await this.prisma.attachement.findMany({
+            where: {
+                TicketId: Id,
+            },
+        });
     }
     async fetchAttachment() {
         const Attachement = await this.prisma.attachement.findMany();
@@ -47,6 +66,19 @@ let TicketService = exports.TicketService = class TicketService {
             data,
         });
         return Attachment;
+    }
+    async deleteTicket(Id) {
+        const attachment = await this.prisma.attachement.deleteMany({
+            where: {
+                TicketId: Id,
+            },
+        });
+        const ticket = await this.prisma.tickets.delete({
+            where: {
+                Id,
+            },
+        });
+        return ticket;
     }
 };
 exports.TicketService = TicketService = __decorate([

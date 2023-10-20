@@ -51,9 +51,7 @@ let UserService = exports.UserService = class UserService {
             try {
                 Password = await bcrypt_1.default.hash(data.Password, 10);
             }
-            catch (e) {
-                console.log(e);
-            }
+            catch (e) { }
         }
         else
             Password = ' ';
