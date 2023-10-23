@@ -67,6 +67,15 @@ let TicketService = exports.TicketService = class TicketService {
         });
         return Attachment;
     }
+    async updateTicket(Id, data) {
+        const Ticket = await this.prisma.tickets.update({
+            where: {
+                Id,
+            },
+            data,
+        });
+        return Ticket;
+    }
     async deleteTicket(Id) {
         const attachment = await this.prisma.attachement.deleteMany({
             where: {
@@ -79,6 +88,12 @@ let TicketService = exports.TicketService = class TicketService {
             },
         });
         return ticket;
+    }
+    async deleteAttachment(Id) {
+        const attachement = await this.prisma.attachement.delete({
+            where: { Id },
+        });
+        return attachement;
     }
 };
 exports.TicketService = TicketService = __decorate([

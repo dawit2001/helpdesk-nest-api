@@ -66,6 +66,26 @@ export declare class TicketController {
         Createdat: Date;
         CreatedBy: string;
     }>;
+    deleteAttachment(attachId: string): Promise<{
+        Id: string;
+        FileName: string;
+        FilePath: string;
+        Size: import("@prisma/client/runtime/library").Decimal;
+        Mimi_Type: string;
+        TicketId: string;
+        Createdat: Date;
+        CreatedBy: string;
+    }>;
+    updateTicket(userId: string, updateTicket: newTicketDto): Promise<{
+        Id: string;
+        IssueType: string;
+        Priority: string;
+        Subject: string;
+        Description: string;
+        UserId: string;
+        CreatedAt: Date;
+        UpdatedAt: Date;
+    }>;
     DeleteTicket(TicketId: string): Promise<{
         Id: string;
         Type: string;

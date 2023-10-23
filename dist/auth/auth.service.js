@@ -25,7 +25,7 @@ let AuthService = exports.AuthService = class AuthService {
     async SignIn({ Email, Password }) {
         const user = await this.UserService.Login({ Email });
         if (!user) {
-            throw new common_1.UnauthorizedException('Email not found');
+            throw new common_1.UnauthorizedException('Email not found.Please enter your valid email !!!');
         }
         if (!this.validatePassword(Password, user.Password))
             throw new common_1.UnauthorizedException('Invalid Password');

@@ -115,6 +115,35 @@ let TicketController = exports.TicketController = class TicketController {
             CreatedBy,
         };
     }
+    async deleteAttachment(attachId) {
+        const attachement = await this.TicketService.deleteAttachment(attachId);
+        console.log(attachement);
+        const { Id, FileName, FilePath, Size, Mimi_Type, TicketId, Createdat, CreatedBy, } = attachement;
+        return {
+            Id,
+            FileName,
+            FilePath,
+            Size,
+            Mimi_Type,
+            TicketId,
+            Createdat,
+            CreatedBy,
+        };
+    }
+    async updateTicket(userId, updateTicket) {
+        const Ticket = await this.TicketService.updateTicket(userId, updateTicket);
+        const { Id, Type: IssueType, Priority, Subject, Content: Description, UserId, CreatedAt, UpdatedAt, } = Ticket;
+        return {
+            Id,
+            IssueType,
+            Priority,
+            Subject,
+            Description,
+            UserId,
+            CreatedAt,
+            UpdatedAt,
+        };
+    }
     async DeleteTicket(TicketId) {
         const Ticket = await this.TicketService.deleteTicket(TicketId);
         if (Ticket) {
@@ -176,6 +205,21 @@ __decorate([
     __metadata("design:paramtypes", [Ticket_dto_1.AttachmentDto]),
     __metadata("design:returntype", Promise)
 ], TicketController.prototype, "newAttachment", null);
+__decorate([
+    (0, common_1.Delete)('attachment/:Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "deleteAttachment", null);
+__decorate([
+    (0, common_1.Put)(':Id'),
+    __param(0, (0, common_1.Param)('Id')),
+    __param(1, (0, common_1.Body)()),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Ticket_dto_1.newTicketDto]),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "updateTicket", null);
 __decorate([
     (0, common_1.Delete)(':Id'),
     __param(0, (0, common_1.Param)('Id')),
