@@ -40,7 +40,7 @@ let TicketController = exports.TicketController = class TicketController {
     async getTickets(userId, offset, limit) {
         const { Tickets, count } = await this.TicketService.getUserTickets(userId, parseInt(offset), parseInt(limit));
         const Ticket = Tickets.map((ticket) => {
-            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = ticket;
+            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, Status, } = ticket;
             const tickets = {
                 Id,
                 Type,
@@ -50,6 +50,7 @@ let TicketController = exports.TicketController = class TicketController {
                 UserId,
                 CreatedAt,
                 UpdatedAt,
+                Status,
             };
             return tickets;
         });
@@ -57,7 +58,7 @@ let TicketController = exports.TicketController = class TicketController {
     }
     async newTicket(newTicketDto) {
         const Ticket = await this.TicketService.newTicket(newTicketDto);
-        const { Id, Type: IssueType, Priority, Subject, Content: Description, UserId, CreatedAt, UpdatedAt, } = Ticket;
+        const { Id, Type: IssueType, Priority, Subject, Content: Description, UserId, CreatedAt, UpdatedAt, Status, } = Ticket;
         return {
             Id,
             IssueType,
@@ -67,6 +68,7 @@ let TicketController = exports.TicketController = class TicketController {
             UserId,
             CreatedAt,
             UpdatedAt,
+            Status,
         };
     }
     async fetchAttachment(attachId) {

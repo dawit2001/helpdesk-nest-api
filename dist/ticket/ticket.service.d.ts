@@ -21,6 +21,8 @@ export declare class TicketService {
         Priority: string;
         Subject: string;
         Content: string;
+        Status: string;
+        Note: string;
         DepartmentId: string;
         FirstResponseDue: Date;
         ResolutionDue: Date;

@@ -23,6 +23,7 @@ export declare class TicketController {
             UserId: string;
             CreatedAt: Date;
             UpdatedAt: Date;
+            Status: string;
         }[];
         count: number;
     }>;
@@ -35,6 +36,7 @@ export declare class TicketController {
         UserId: string;
         CreatedAt: Date;
         UpdatedAt: Date;
+        Status: string;
     }>;
     fetchAttachment(attachId: string): Promise<{
         Id: string;
