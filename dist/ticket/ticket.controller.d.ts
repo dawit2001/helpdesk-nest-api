@@ -10,6 +10,7 @@ export declare class TicketController {
         Subject: string;
         Content: string;
         UserId: string;
+        Status: string;
         CreatedAt: Date;
         UpdatedAt: Date;
     }>;
@@ -86,6 +87,7 @@ export declare class TicketController {
         Description: string;
         UserId: string;
         CreatedAt: Date;
+        Status: string;
         UpdatedAt: Date;
     }>;
     DeleteTicket(TicketId: string): Promise<{

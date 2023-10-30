@@ -23,7 +23,8 @@ let TicketController = exports.TicketController = class TicketController {
     async getTicket(TicketId) {
         const Ticket = await this.TicketService.getTicket(TicketId);
         if (Ticket) {
-            const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, } = Ticket;
+            const { Id, Type, Priority, Subject, Content, UserId, Status, CreatedAt, UpdatedAt, } = Ticket;
+            console.log(Ticket);
             return {
                 Id,
                 Type,
@@ -31,6 +32,7 @@ let TicketController = exports.TicketController = class TicketController {
                 Subject,
                 Content,
                 UserId,
+                Status,
                 CreatedAt,
                 UpdatedAt,
             };
@@ -39,6 +41,7 @@ let TicketController = exports.TicketController = class TicketController {
     }
     async getTickets(userId, offset, limit) {
         const { Tickets, count } = await this.TicketService.getUserTickets(userId, parseInt(offset), parseInt(limit));
+        console.log(Tickets);
         const Ticket = Tickets.map((ticket) => {
             const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, Status, } = ticket;
             const tickets = {
@@ -134,7 +137,7 @@ let TicketController = exports.TicketController = class TicketController {
     }
     async updateTicket(userId, updateTicket) {
         const Ticket = await this.TicketService.updateTicket(userId, updateTicket);
-        const { Id, Type: IssueType, Priority, Subject, Content: Description, UserId, CreatedAt, UpdatedAt, } = Ticket;
+        const { Id, Type: IssueType, Priority, Subject, Content: Description, UserId, CreatedAt, Status, UpdatedAt, } = Ticket;
         return {
             Id,
             IssueType,
@@ -143,6 +146,7 @@ let TicketController = exports.TicketController = class TicketController {
             Description,
             UserId,
             CreatedAt,
+            Status,
             UpdatedAt,
         };
     }
