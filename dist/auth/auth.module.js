@@ -18,6 +18,10 @@ const auth_controller_1 = require("./auth.controller");
 const user_controller_1 = require("../user/user.controller");
 const user_service_1 = require("../user/user.service");
 const prisma_service_1 = require("../prisma/prisma.service");
+const email_service_1 = require("../email/email.service");
+const email_module_1 = require("../email/email.module");
+const socket_module_1 = require("../socket/socket.module");
+const socket_gateway_1 = require("../socket/socket.gateway");
 let AuthModule = exports.AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule = __decorate([
@@ -28,8 +32,10 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_1.JwtModule.register({
                 global: true,
                 secret: process.env.JWT_SECRET_KEY,
-                signOptions: { expiresIn: '24h' },
+                signOptions: { expiresIn: '15m' },
             }),
+            email_module_1.EmailModule,
+            socket_module_1.SocketModule,
         ],
         providers: [
             auth_service_1.AuthService,
@@ -37,6 +43,9 @@ exports.AuthModule = AuthModule = __decorate([
             jwt_strategy_1.JwtStrategy,
             user_service_1.UserService,
             prisma_service_1.PrismaService,
+            email_service_1.EmailService,
+            jwt_1.JwtService,
+            socket_gateway_1.SocketGateway,
         ],
         controllers: [auth_controller_1.AuthController, user_controller_1.UserController],
     })

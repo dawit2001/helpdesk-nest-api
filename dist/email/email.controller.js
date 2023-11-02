@@ -5,18 +5,22 @@ var __decorate = (this && this.__decorate) || function (decorators, target, key,
     else for (var i = decorators.length - 1; i >= 0; i--) if (d = decorators[i]) r = (c < 3 ? d(r) : c > 3 ? d(target, key, r) : d(target, key)) || r;
     return c > 3 && r && Object.defineProperty(target, key, r), r;
 };
-Object.defineProperty(exports, "__esModule", { value: true });
-exports.UserModule = void 0;
-const common_1 = require("@nestjs/common");
-const user_service_1 = require("./user.service");
-const prisma_service_1 = require("../prisma/prisma.service");
-const email_service_1 = require("../email/email.service");
-const auth_service_1 = require("../auth/auth.service");
-let UserModule = exports.UserModule = class UserModule {
+var __metadata = (this && this.__metadata) || function (k, v) {
+    if (typeof Reflect === "object" && typeof Reflect.metadata === "function") return Reflect.metadata(k, v);
 };
-exports.UserModule = UserModule = __decorate([
-    (0, common_1.Module)({
-        providers: [user_service_1.UserService, prisma_service_1.PrismaService, email_service_1.EmailService, auth_service_1.AuthService],
-    })
-], UserModule);
-//# sourceMappingURL=user.module.js.map
+Object.defineProperty(exports, "__esModule", { value: true });
+exports.EmailController = void 0;
+const common_1 = require("@nestjs/common");
+const email_service_1 = require("./email.service");
+const auth_service_1 = require("../auth/auth.service");
+let EmailController = exports.EmailController = class EmailController {
+    constructor(emailService, authService) {
+        this.emailService = emailService;
+    }
+};
+exports.EmailController = EmailController = __decorate([
+    (0, common_1.Controller)('email-verification'),
+    __metadata("design:paramtypes", [email_service_1.EmailService,
+        auth_service_1.AuthService])
+], EmailController);
+//# sourceMappingURL=email.controller.js.map

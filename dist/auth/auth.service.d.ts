@@ -3,14 +3,55 @@ import { UserService } from 'src/user/user.service';
 import { SignInDto, SignUpDto } from 'src/user/user.dto';
 export declare class AuthService {
     private readonly JWTService;
-    readonly UserService: UserService;
+    private readonly UserService;
     constructor(JWTService: JwtService, UserService: UserService);
+    generateEmailToken(payload: any): Promise<string>;
     generateToken(payload: any): Promise<string>;
-    SignIn({ Email, Password }: SignInDto): Promise<string>;
+    generateRefreshToken(payload: any): Promise<string>;
+    private refreshAccessToken;
+    validateToken(token: string): any;
+    verifyEmailtoken(token: string): any;
+    SignIn({ Email, Password }: SignInDto): Promise<{
+        AccessToken: string;
+        RefreshToken: string;
+    }>;
     private validatePassword;
-    SignUp(signUpDto: SignUpDto): Promise<string>;
-    signInWithGoogle(signupDto: SignUpDto): Promise<string>;
-    signInWithGoogleAgent(signupDto: SignUpDto): Promise<string>;
+    SignUp(signUpDto: SignUpDto): Promise<{
+        Id: string;
+        FullName: string;
+        UserName: string;
+        Email: string;
+        Password: string;
+        Image: string;
+        UserType: string;
+        About: string;
+        CreatedDate: Date;
+        WorkingPhone: string;
+        MobilePhone: string;
+        Verified: boolean;
+    }>;
+    verifyedUser(Id: string): Promise<{
+        Id: string;
+        FullName: string;
+        UserName: string;
+        Email: string;
+        Password: string;
+        Image: string;
+        UserType: string;
+        About: string;
+        CreatedDate: Date;
+        WorkingPhone: string;
+        MobilePhone: string;
+        Verified: boolean;
+    }>;
+    signInWithGoogle(signupDto: SignUpDto): Promise<{
+        AccessToken: string;
+        RefreshToken: string;
+    }>;
+    signInWithGoogleAgent(signupDto: SignUpDto): Promise<{
+        AccessToken: string;
+        RefreshToken: string;
+    }>;
     UserProfile({ userId }: any): Promise<{
         Id: string;
         FullName: string;
@@ -23,5 +64,6 @@ export declare class AuthService {
         CreatedDate: Date;
         WorkingPhone: string;
         MobilePhone: string;
+        Verified: boolean;
     }>;
 }

@@ -23,14 +23,32 @@ const search_service_1 = require("./search/search.service");
 const search_module_1 = require("./search/search.module");
 const email_service_1 = require("./email/email.service");
 const email_module_1 = require("./email/email.module");
+const socket_gateway_1 = require("./socket/socket.gateway");
+const socket_module_1 = require("./socket/socket.module");
 let AppModule = exports.AppModule = class AppModule {
     configure(consumer) { }
 };
 exports.AppModule = AppModule = __decorate([
     (0, common_1.Module)({
-        imports: [user_module_1.UserModule, auth_module_1.AuthModule, passport_1.PassportModule, ticket_module_1.TicketModule, search_module_1.SearchModule, email_module_1.EmailModule],
+        imports: [
+            user_module_1.UserModule,
+            auth_module_1.AuthModule,
+            passport_1.PassportModule,
+            ticket_module_1.TicketModule,
+            search_module_1.SearchModule,
+            email_module_1.EmailModule,
+            socket_module_1.SocketModule,
+        ],
         controllers: [app_controller_1.AppController, user_controller_1.UserController, auth_controller_1.AuthController],
-        providers: [app_service_1.AppService, prisma_service_1.PrismaService, auth_service_1.AuthService, user_service_1.UserService, search_service_1.SearchService, email_service_1.EmailService],
+        providers: [
+            app_service_1.AppService,
+            prisma_service_1.PrismaService,
+            auth_service_1.AuthService,
+            user_service_1.UserService,
+            search_service_1.SearchService,
+            email_service_1.EmailService,
+            socket_gateway_1.SocketGateway,
+        ],
     })
 ], AppModule);
 //# sourceMappingURL=app.module.js.map

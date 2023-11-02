@@ -16,50 +16,124 @@ exports.AuthController = void 0;
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("./auth.service");
 const auth_guard_1 = require("./auth.guard");
+const email_service_1 = require("../email/email.service");
+const unauthorized_exception_1 = require("../exception/unauthorized.exception");
+const socket_gateway_1 = require("../socket/socket.gateway");
+const api = process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
+    ? 'https://kns-support.verce.app'
+    : 'http://localhost:3000';
 let AuthController = exports.AuthController = class AuthController {
-    constructor(authService) {
+    constructor(authService, emailService, socketGateway) {
         this.authService = authService;
-        this.setAccessTokenCookie = (res, AccessToken) => {
+        this.emailService = emailService;
+        this.socketGateway = socketGateway;
+        this.setAccessTokenCookie = (res, AccessToken, RefreshToken) => {
             res.cookie('access_token', AccessToken, {
                 httpOnly: true,
                 secure: true,
                 sameSite: 'none',
-                expires: new Date(Date.now() + 1 * 24 * 60 * 60 * 1000),
+                expires: new Date(Date.now() + 15 * 60 * 1000),
+                path: '/',
+            });
+            res.cookie('refresh_token', RefreshToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 2 * 30 * 24 * 60 * 60 * 1000),
                 path: '/',
             });
         };
     }
     async signup(req, res) {
-        const AccessToken = await this.authService.SignUp(req.body);
         res.clearCookie('access_token');
-        this.setAccessTokenCookie(res, AccessToken);
-        res.send('successfully registerd');
+        res.clearCookie('refresh_token');
+        const EmailToken = await this.authService.generateEmailToken({
+            sub: req.body.Id,
+            username: req.body.UserName,
+        });
+        console.log(EmailToken);
+        try {
+            const user = await this.authService.SignUp(req.body);
+            await this.emailService.sendVerificationEmail(req.body, EmailToken);
+            const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = user;
+            res.status(200).send({
+                Id,
+                FullName,
+                Email,
+                UserName,
+                UserType,
+                Image,
+                WorkingPhone,
+                MobilePhone,
+                Verified,
+            });
+        }
+        catch (e) {
+            throw new unauthorized_exception_1.PasswordUpdateException('something went wrong...');
+        }
+    }
+    async verifyEmail(token, req, res) {
+        console.log(token);
+        try {
+            const decodedToken = await this.authService.verifyEmailtoken(token);
+            console.log(decodedToken);
+            if (!decodedToken)
+                throw new unauthorized_exception_1.PasswordUpdateException('Invalid token...');
+            const isTokenExpired = this.isTokenExpired(decodedToken.exp);
+            if (isTokenExpired)
+                throw new unauthorized_exception_1.PasswordUpdateException('Token expired...');
+            const user = await this.authService.verifyedUser(decodedToken.sub);
+            const payload = { sub: user.Id, userName: user.UserName };
+            const AccessToken = await this.authService.generateToken(payload);
+            const RefreshToken = await this.authService.generateRefreshToken(payload);
+            this.socketGateway.server.emit('emailConfirmed', user.Id, AccessToken, RefreshToken);
+            this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+            res.redirect(`${api}`);
+        }
+        catch (e) { }
     }
     async signin(req, res) {
-        const AccessToken = await this.authService.SignIn(req.body);
+        const { AccessToken, RefreshToken } = await this.authService.SignIn(req.body);
         res.clearCookie('access_token');
-        this.setAccessTokenCookie(res, AccessToken);
+        res.clearCookie('refresh_token');
+        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send('successfully loggedin');
     }
     async signinwithGoogle(req, res) {
-        const AccessToken = await this.authService.signInWithGoogle(req.body);
         res.clearCookie('access_token');
-        this.setAccessTokenCookie(res, AccessToken);
+        res.clearCookie('refresh_token');
+        if (!(await this.authService.signInWithGoogle(req.body))) {
+            console.log(req.body);
+            const EmailToken = await this.authService.generateEmailToken({
+                sub: req.body.Id,
+                username: req.body.UserName,
+            });
+            console.log(EmailToken);
+            try {
+                await this.authService.SignUp(req.body);
+                await this.emailService.sendVerificationEmail(req.body, EmailToken);
+            }
+            catch (e) { }
+        }
+        const { AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
+        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send({ status: 'ok' });
     }
     async signinwithGoogleAgent(req, res) {
-        const AccessToken = await this.authService.signInWithGoogleAgent(req.body);
+        const { AccessToken, RefreshToken } = await this.authService.signInWithGoogleAgent(req.body);
         res.clearCookie('access_token');
-        this.setAccessTokenCookie(res, AccessToken);
+        res.clearCookie('refresh_token');
+        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send({ status: 'ok' });
     }
     async signout(res) {
         res.clearCookie('access_token');
+        res.clearCookie('refresh_token');
         res.send('user logged out');
     }
     async getProfile(req) {
         const { userId } = req.user;
-        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, } = await this.authService.UserProfile({ userId });
+        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile({ userId });
         return {
             Id,
             FullName,
@@ -69,7 +143,49 @@ let AuthController = exports.AuthController = class AuthController {
             Image,
             WorkingPhone,
             MobilePhone,
+            Verified,
         };
+    }
+    isTokenExpired(expirationTimestamp) {
+        const now = Date.now() / 1000;
+        return now >= expirationTimestamp;
+    }
+    async refreshAccessToken(req, res) {
+        if (!req.cookies['refresh_token'])
+            throw new common_1.UnauthorizedException('User not authorized...');
+        try {
+            const decodedToken = this.authService.validateToken(req.cookies['refresh_token']);
+            if (!decodedToken || this.isTokenExpired(decodedToken.exp))
+                throw new common_1.UnauthorizedException('User not authorized...');
+            const userId = decodedToken.sub;
+            const user = await this.authService.UserProfile({ userId });
+            if (!user)
+                throw new common_1.UnauthorizedException('User not authorized...');
+            const payload = { sub: user.Id, username: user.UserName };
+            const AccessToken = await this.authService.generateToken(payload);
+            console.log(AccessToken);
+            res.cookie('access_token', AccessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
+                path: '/',
+            });
+            const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, } = user;
+            res.send({
+                Id,
+                FullName,
+                Email,
+                UserName,
+                UserType,
+                Image,
+                WorkingPhone,
+                MobilePhone,
+            });
+        }
+        catch (e) {
+            throw new common_1.UnauthorizedException('User is not authorized .....');
+        }
     }
 };
 __decorate([
@@ -80,6 +196,15 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signup", null);
+__decorate([
+    (0, common_1.Get)('confirm/:token'),
+    __param(0, (0, common_1.Param)('token')),
+    __param(1, (0, common_1.Req)()),
+    __param(2, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String, Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "verifyEmail", null);
 __decorate([
     (0, common_1.Post)('login'),
     __param(0, (0, common_1.Req)()),
@@ -119,8 +244,18 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Post)('refresh'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "refreshAccessToken", null);
 exports.AuthController = AuthController = __decorate([
     (0, common_1.Controller)('auth'),
-    __metadata("design:paramtypes", [auth_service_1.AuthService])
+    __metadata("design:paramtypes", [auth_service_1.AuthService,
+        email_service_1.EmailService,
+        socket_gateway_1.SocketGateway])
 ], AuthController);
 //# sourceMappingURL=auth.controller.js.map

@@ -18,9 +18,53 @@ let AuthService = exports.AuthService = class AuthService {
     constructor(JWTService, UserService) {
         this.JWTService = JWTService;
         this.UserService = UserService;
+        this.refreshAccessToken = (res, AccessToken) => {
+            res.cookie('access_token', AccessToken, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 15 * 60 * 1000),
+                path: '/',
+            });
+        };
+    }
+    async generateEmailToken(payload) {
+        return this.JWTService.sign(payload, {
+            expiresIn: '15m',
+            secret: process.env.JWT_EMAIL_TOKEN,
+        });
     }
     async generateToken(payload) {
-        return this.JWTService.sign(payload);
+        return this.JWTService.sign(payload, {
+            expiresIn: '15m',
+            secret: process.env.JWT_SECRET_KEY,
+        });
+    }
+    async generateRefreshToken(payload) {
+        return this.JWTService.sign(payload, {
+            expiresIn: '30d',
+            secret: process.env.JWT_REFRESH_SECRET_KEY,
+        });
+    }
+    validateToken(token) {
+        try {
+            return this.JWTService.verify(token, {
+                secret: process.env.JWT_REFRESH_SECRET_KEY,
+            });
+        }
+        catch (e) {
+            return null;
+        }
+    }
+    verifyEmailtoken(token) {
+        try {
+            return this.JWTService.verify(token, {
+                secret: process.env.JWT_EMAIL_TOKEN,
+            });
+        }
+        catch (e) {
+            return null;
+        }
     }
     async SignIn({ Email, Password }) {
         const user = await this.UserService.Login({ Email });
@@ -31,25 +75,37 @@ let AuthService = exports.AuthService = class AuthService {
             throw new common_1.UnauthorizedException('Invalid Password');
         const payload = { sub: user.Id, userName: user.UserName };
         const AccessToken = await this.generateToken(payload);
-        return AccessToken;
+        const RefreshToken = await this.generateRefreshToken(payload);
+        return { AccessToken, RefreshToken };
     }
     async validatePassword(Password, HashPassword) {
         return Password.includes(HashPassword);
     }
     async SignUp(signUpDto) {
-        const user = await this.UserService.SignUP(signUpDto);
-        const payload = { sub: user.Id, userName: user.UserName };
-        const AccessToken = await this.generateToken(payload);
-        return AccessToken;
+        const { Email } = signUpDto;
+        let user = await this.UserService.Login({ Email });
+        if (user)
+            throw new unauthorized_exception_1.PasswordUpdateException('User already exist....');
+        signUpDto.Verified = false;
+        user = await this.UserService.SignUP(signUpDto);
+        return user;
+    }
+    async verifyedUser(Id) {
+        const unverified = await this.UserService.User({ Id });
+        const verifiedUser = await this.UserService.updateUser(Id, {
+            Verified: true,
+        });
+        return verifiedUser;
     }
     async signInWithGoogle(signupDto) {
         const { Email } = signupDto;
         let user = await this.UserService.Login({ Email });
         if (!user)
-            user = await this.UserService.SignUP(signupDto);
+            return null;
         const payload = { sub: user.Id, userName: user.UserName };
         const AccessToken = await this.generateToken(payload);
-        return AccessToken;
+        const RefreshToken = await this.generateRefreshToken(payload);
+        return { AccessToken, RefreshToken };
     }
     async signInWithGoogleAgent(signupDto) {
         const { Email, UserType } = signupDto;
@@ -58,7 +114,8 @@ let AuthService = exports.AuthService = class AuthService {
             throw new unauthorized_exception_1.PasswordUpdateException('This email is not registered!!!');
         const payload = { sub: user.Id, userName: user.UserName };
         const AccessToken = await this.generateToken(payload);
-        return AccessToken;
+        const RefreshToken = await this.generateRefreshToken(payload);
+        return { AccessToken, RefreshToken };
     }
     async UserProfile({ userId }) {
         const { userId: Id } = { userId };

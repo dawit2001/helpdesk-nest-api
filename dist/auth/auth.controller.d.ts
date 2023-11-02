@@ -1,10 +1,15 @@
 import { AuthService } from './auth.service';
 import { Request as request, Response } from 'express';
+import { EmailService } from 'src/email/email.service';
+import { SocketGateway } from 'src/socket/socket.gateway';
 export declare class AuthController {
     private readonly authService;
-    constructor(authService: AuthService);
+    private readonly emailService;
+    private readonly socketGateway;
+    constructor(authService: AuthService, emailService: EmailService, socketGateway: SocketGateway);
     private setAccessTokenCookie;
     signup(req: request, res: Response): Promise<void>;
+    verifyEmail(token: string, req: request, res: Response): Promise<void>;
     signin(req: request, res: Response): Promise<void>;
     signinwithGoogle(req: request, res: Response): Promise<void>;
     signinwithGoogleAgent(req: request, res: Response): Promise<void>;
@@ -18,5 +23,8 @@ export declare class AuthController {
         Image: string;
         WorkingPhone: string;
         MobilePhone: string;
+        Verified: boolean;
     }>;
+    private isTokenExpired;
+    refreshAccessToken(req: request, res: Response): Promise<void>;
 }
