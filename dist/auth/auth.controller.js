@@ -86,7 +86,11 @@ let AuthController = exports.AuthController = class AuthController {
             const payload = { sub: user.Id, userName: user.UserName };
             const AccessToken = await this.authService.generateToken(payload);
             const RefreshToken = await this.authService.generateRefreshToken(payload);
-            this.socketGateway.server.emit('emailConfirmed', user.Id, AccessToken, RefreshToken);
+            this.socketGateway.server.emit('emailConfirmed', [
+                user.Id,
+                AccessToken,
+                RefreshToken,
+            ]);
             this.setAccessTokenCookie(res, AccessToken, RefreshToken);
             res.redirect(`${api}`);
         }
@@ -112,6 +116,7 @@ let AuthController = exports.AuthController = class AuthController {
             try {
                 await this.authService.SignUp(req.body);
                 await this.emailService.sendVerificationEmail(req.body, EmailToken);
+                return;
             }
             catch (e) { }
         }

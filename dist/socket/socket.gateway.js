@@ -14,12 +14,6 @@ const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let SocketGateway = exports.SocketGateway = class SocketGateway {
     async emailConfirmed(client, userId, AccessToken, RefreshToken) {
-        console.log(client);
-        console.log(userId);
-        client.handshake.headers.cookie = `access_token=${AccessToken}; refresh_token=${RefreshToken}`;
-        this.server
-            .to(client.id)
-            .emit('emailConfirmed', 'Your email is successfully confirmed');
         client.disconnect(true);
     }
 };
