@@ -146,7 +146,6 @@ export class AuthController {
       try {
         await this.authService.SignUp(req.body);
         await this.emailService.sendVerificationEmail(req.body, EmailToken);
-        return;
       } catch (e) {}
     }
     const { AccessToken, RefreshToken } =
