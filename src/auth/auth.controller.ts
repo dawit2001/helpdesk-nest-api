@@ -21,7 +21,7 @@ import { PasswordUpdateException } from 'src/exception/unauthorized.exception';
 import { SocketGateway } from 'src/socket/socket.gateway';
 
 const api =
-  process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
+  process.env.NEST_ENV === 'PRODUCTION'
     ? 'https://kns-support.vercel.app'
     : 'http://localhost:3000';
 
