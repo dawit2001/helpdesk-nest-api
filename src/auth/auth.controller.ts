@@ -146,12 +146,15 @@ export class AuthController {
       try {
         await this.authService.SignUp(req.body);
         await this.emailService.sendVerificationEmail(req.body, EmailToken);
-      } catch (e) {}
+      } catch (e) {
+        throw new PasswordUpdateException(e.message);
+      }
+    } else {
+      const { AccessToken, RefreshToken } =
+        await this.authService.signInWithGoogle(req.body);
+      this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+      res.send({ status: 'ok' });
     }
-    const { AccessToken, RefreshToken } =
-      await this.authService.signInWithGoogle(req.body);
-    this.setAccessTokenCookie(res, AccessToken, RefreshToken);
-    res.send({ status: 'ok' });
   }
 
   @Post('googleAuth/agent')
@@ -159,10 +162,10 @@ export class AuthController {
     @Req() req: request,
     @Res({ passthrough: true }) res: Response,
   ) {
-    const { AccessToken, RefreshToken } =
-      await this.authService.signInWithGoogleAgent(req.body);
     res.clearCookie('access_token');
     res.clearCookie('refresh_token');
+    const { AccessToken, RefreshToken } =
+      await this.authService.signInWithGoogleAgent(req.body);
     this.setAccessTokenCookie(res, AccessToken, RefreshToken);
     res.send({ status: 'ok' });
   }
