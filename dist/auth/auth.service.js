@@ -100,12 +100,14 @@ let AuthService = exports.AuthService = class AuthService {
     async signInWithGoogle(signupDto) {
         const { Email } = signupDto;
         let user = await this.UserService.Login({ Email });
-        if (!user)
+        if (user) {
+            const payload = { sub: user.Id, userName: user.UserName };
+            const AccessToken = await this.generateToken(payload);
+            const RefreshToken = await this.generateRefreshToken(payload);
+            return { AccessToken, RefreshToken };
+        }
+        else
             return null;
-        const payload = { sub: user.Id, userName: user.UserName };
-        const AccessToken = await this.generateToken(payload);
-        const RefreshToken = await this.generateRefreshToken(payload);
-        return { AccessToken, RefreshToken };
     }
     async signInWithGoogleAgent(signupDto) {
         const { Email, UserType } = signupDto;

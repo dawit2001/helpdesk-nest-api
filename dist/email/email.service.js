@@ -13,6 +13,7 @@ exports.EmailService = void 0;
 const mailer_1 = require("@nestjs-modules/mailer");
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../auth/auth.service");
+const unauthorized_exception_1 = require("../exception/unauthorized.exception");
 const api = process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
     ? 'https://kns-support-api.onrender.com'
     : 'http://localhost:8000';
@@ -23,9 +24,7 @@ let EmailService = exports.EmailService = class EmailService {
         this.authservice = authservice;
     }
     async sendVerificationEmail(user, verificationToken) {
-        console.log(verificationToken);
         const decodedToken = await this.authservice.verifyEmailtoken(verificationToken);
-        console.log(decodedToken);
         const url = `${api}/auth/confirm/${verificationToken}`;
         try {
             await this.mailerService.sendMail({
@@ -39,7 +38,7 @@ let EmailService = exports.EmailService = class EmailService {
             });
         }
         catch (e) {
-            console.log(e);
+            throw new unauthorized_exception_1.PasswordUpdateException(e.message);
         }
     }
 };

@@ -20,7 +20,7 @@ const email_service_1 = require("../email/email.service");
 const unauthorized_exception_1 = require("../exception/unauthorized.exception");
 const socket_gateway_1 = require("../socket/socket.gateway");
 const api = process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
-    ? 'https://kns-support.verce.app'
+    ? 'https://kns-support.vercel.app'
     : 'http://localhost:3000';
 let AuthController = exports.AuthController = class AuthController {
     constructor(authService, emailService, socketGateway) {
@@ -51,7 +51,6 @@ let AuthController = exports.AuthController = class AuthController {
             sub: req.body.Id,
             username: req.body.UserName,
         });
-        console.log(EmailToken);
         try {
             const user = await this.authService.SignUp(req.body);
             await this.emailService.sendVerificationEmail(req.body, EmailToken);
@@ -69,14 +68,14 @@ let AuthController = exports.AuthController = class AuthController {
             });
         }
         catch (e) {
-            throw new unauthorized_exception_1.PasswordUpdateException('something went wrong...');
+            throw new unauthorized_exception_1.PasswordUpdateException(e.message);
         }
     }
     async verifyEmail(token, req, res) {
-        console.log(token);
         try {
+            res.clearCookie('access_token');
+            res.clearCookie('refresh_token');
             const decodedToken = await this.authService.verifyEmailtoken(token);
-            console.log(decodedToken);
             if (!decodedToken)
                 throw new unauthorized_exception_1.PasswordUpdateException('Invalid token...');
             const isTokenExpired = this.isTokenExpired(decodedToken.exp);
@@ -92,9 +91,11 @@ let AuthController = exports.AuthController = class AuthController {
                 RefreshToken,
             ]);
             this.setAccessTokenCookie(res, AccessToken, RefreshToken);
-            res.redirect(`${api}`);
+            res.redirect(api);
         }
-        catch (e) { }
+        catch (e) {
+            throw new unauthorized_exception_1.PasswordUpdateException(e.message);
+        }
     }
     async signin(req, res) {
         const { AccessToken, RefreshToken } = await this.authService.SignIn(req.body);
@@ -107,12 +108,10 @@ let AuthController = exports.AuthController = class AuthController {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
         if (!(await this.authService.signInWithGoogle(req.body))) {
-            console.log(req.body);
             const EmailToken = await this.authService.generateEmailToken({
                 sub: req.body.Id,
                 username: req.body.UserName,
             });
-            console.log(EmailToken);
             try {
                 await this.authService.SignUp(req.body);
                 await this.emailService.sendVerificationEmail(req.body, EmailToken);
@@ -167,7 +166,6 @@ let AuthController = exports.AuthController = class AuthController {
                 throw new common_1.UnauthorizedException('User not authorized...');
             const payload = { sub: user.Id, username: user.UserName };
             const AccessToken = await this.authService.generateToken(payload);
-            console.log(AccessToken);
             res.cookie('access_token', AccessToken, {
                 httpOnly: true,
                 secure: true,
