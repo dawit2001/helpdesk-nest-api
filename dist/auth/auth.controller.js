@@ -228,7 +228,8 @@ let AuthController = exports.AuthController = class AuthController {
     async getProfile(req) {
         const { userId } = req.user;
         console.log(req.user);
-        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile({ userId });
+        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(userId);
+        console.log(Id);
         return {
             Id,
             FullName,
@@ -253,7 +254,7 @@ let AuthController = exports.AuthController = class AuthController {
             if (!decodedToken || this.isTokenExpired(decodedToken.exp))
                 throw new common_1.UnauthorizedException('User not authorized...');
             const userId = decodedToken.sub;
-            const user = await this.authService.UserProfile({ userId });
+            const user = await this.authService.UserProfile(userId);
             if (!user)
                 throw new common_1.UnauthorizedException('User not authorized...');
             const payload = { sub: user.Id, username: user.UserName };

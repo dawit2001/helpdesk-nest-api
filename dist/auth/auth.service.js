@@ -118,7 +118,9 @@ let AuthService = exports.AuthService = class AuthService {
     }
     async UserProfile(userId) {
         const { userId: Id } = userId;
+        console.log(Id);
         const user = await this.UserService.User({ Id });
+        console.log(user);
         return user;
     }
 };

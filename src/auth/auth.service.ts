@@ -119,8 +119,10 @@ export class AuthService {
   }
   async UserProfile(userId: any) {
     const { userId: Id } = userId;
+    console.log(Id);
 
     const user = await this.UserService.User({ Id });
+    console.log(user);
     return user;
   }
 }
