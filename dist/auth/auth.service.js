@@ -117,7 +117,7 @@ let AuthService = exports.AuthService = class AuthService {
         return { AccessToken, RefreshToken };
     }
     async UserProfile(userId) {
-        const { userId: Id } = { userId };
+        const { userId: Id } = userId;
         const user = await this.UserService.User({ Id });
         return user;
     }
