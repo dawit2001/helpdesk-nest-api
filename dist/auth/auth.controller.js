@@ -226,7 +226,8 @@ let AuthController = exports.AuthController = class AuthController {
         res.send('user logged out');
     }
     async getProfile(req) {
-        const { userId } = req.user;
+        const { Id: userId } = req.body;
+        console.log(userId);
         const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(userId);
         return {
             Id,
@@ -333,7 +334,7 @@ __decorate([
 __decorate([
     (0, common_1.UseGuards)(auth_guard_1.JWTGuard),
     (0, common_1.Get)('profile'),
-    __param(0, (0, common_1.Request)()),
+    __param(0, (0, common_1.Req)()),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)

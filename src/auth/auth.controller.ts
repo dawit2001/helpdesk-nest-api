@@ -296,8 +296,9 @@ export class AuthController {
 
   @UseGuards(JWTGuard)
   @Get('profile')
-  async getProfile(@Request() req) {
-    const { userId } = req.user;
+  async getProfile(@Req() req: request) {
+    const { Id: userId } = req.body;
+    console.log(userId);
     const {
       Id,
       FullName,
