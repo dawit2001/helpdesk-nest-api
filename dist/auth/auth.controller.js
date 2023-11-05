@@ -19,7 +19,7 @@ const auth_guard_1 = require("./auth.guard");
 const email_service_1 = require("../email/email.service");
 const unauthorized_exception_1 = require("../exception/unauthorized.exception");
 const socket_gateway_1 = require("../socket/socket.gateway");
-const api = process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
+const api = process.env.NEST_ENV === 'PRODUCTION'
     ? 'https://kns-support.vercel.app'
     : 'http://localhost:3000';
 let AuthController = exports.AuthController = class AuthController {
@@ -90,19 +90,32 @@ let AuthController = exports.AuthController = class AuthController {
                 AccessToken,
                 RefreshToken,
             ]);
-            this.setAccessTokenCookie(res, AccessToken, RefreshToken);
-            res.redirect(api);
+            res.redirect(`${api}`);
         }
         catch (e) {
             throw new unauthorized_exception_1.PasswordUpdateException(e.message);
         }
     }
     async signin(req, res) {
-        const { AccessToken, RefreshToken } = await this.authService.SignIn(req.body);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
-        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
-        res.send('successfully loggedin');
+        if (!(await this.authService.SignIn(req.body))) {
+            const EmailToken = await this.authService.generateEmailToken({
+                sub: req.body.Id,
+                username: req.body.UserName,
+            });
+            try {
+                await this.emailService.sendVerificationEmail(req.body, EmailToken);
+            }
+            catch (e) {
+                throw new unauthorized_exception_1.PasswordUpdateException(e.message);
+            }
+        }
+        else {
+            const { AccessToken, RefreshToken } = await this.authService.SignIn(req.body);
+            this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+            res.send('successfully loggedin');
+        }
     }
     async signinwithGoogle(req, res) {
         res.clearCookie('access_token');
@@ -116,16 +129,20 @@ let AuthController = exports.AuthController = class AuthController {
                 await this.authService.SignUp(req.body);
                 await this.emailService.sendVerificationEmail(req.body, EmailToken);
             }
-            catch (e) { }
+            catch (e) {
+                throw new unauthorized_exception_1.PasswordUpdateException(e.message);
+            }
         }
-        const { AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
-        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
-        res.send({ status: 'ok' });
+        else {
+            const { AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
+            this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+            res.send({ status: 'ok' });
+        }
     }
     async signinwithGoogleAgent(req, res) {
-        const { AccessToken, RefreshToken } = await this.authService.signInWithGoogleAgent(req.body);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
+        const { AccessToken, RefreshToken } = await this.authService.signInWithGoogleAgent(req.body);
         this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send({ status: 'ok' });
     }

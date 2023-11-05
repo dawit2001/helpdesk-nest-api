@@ -18,15 +18,6 @@ let AuthService = exports.AuthService = class AuthService {
     constructor(JWTService, UserService) {
         this.JWTService = JWTService;
         this.UserService = UserService;
-        this.refreshAccessToken = (res, AccessToken) => {
-            res.cookie('access_token', AccessToken, {
-                httpOnly: true,
-                secure: true,
-                sameSite: 'none',
-                expires: new Date(Date.now() + 15 * 60 * 1000),
-                path: '/',
-            });
-        };
     }
     async generateEmailToken(payload) {
         return this.JWTService.sign(payload, {
@@ -71,6 +62,8 @@ let AuthService = exports.AuthService = class AuthService {
         if (!user) {
             throw new common_1.UnauthorizedException('Email not found.Please enter your valid email !!!');
         }
+        if (user.Verified === false)
+            return null;
         if (!this.validatePassword(Password, user.Password))
             throw new common_1.UnauthorizedException('Invalid Password');
         const payload = { sub: user.Id, userName: user.UserName };

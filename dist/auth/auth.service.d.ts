@@ -8,7 +8,6 @@ export declare class AuthService {
     generateEmailToken(payload: any): Promise<string>;
     generateToken(payload: any): Promise<string>;
     generateRefreshToken(payload: any): Promise<string>;
-    private refreshAccessToken;
     validateToken(token: string): any;
     verifyEmailtoken(token: string): any;
     SignIn({ Email, Password }: SignInDto): Promise<{

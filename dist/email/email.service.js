@@ -14,7 +14,7 @@ const mailer_1 = require("@nestjs-modules/mailer");
 const common_1 = require("@nestjs/common");
 const auth_service_1 = require("../auth/auth.service");
 const unauthorized_exception_1 = require("../exception/unauthorized.exception");
-const api = process.env.NEXT_PUBLIC_REACT_ENV === 'PRODUCTION'
+const api = process.env.NEST_ENV === 'PRODUCTION'
     ? 'https://kns-support-api.onrender.com'
     : 'http://localhost:8000';
 console.log(api);
