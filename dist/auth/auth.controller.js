@@ -191,7 +191,6 @@ let AuthController = exports.AuthController = class AuthController {
             }
         }
         else {
-            console.log(AccessToken, RefreshToken);
             this.setAccessTokenCookie(res, AccessToken, RefreshToken);
             res.send({ status: 'ok' });
         }
@@ -203,7 +202,8 @@ let AuthController = exports.AuthController = class AuthController {
         this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send({ status: 'ok' });
     }
-    async signout(res) {
+    async signout(req, res) {
+        console.log(req.cookies['access_token']);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
         res.send('user logged out');
@@ -307,9 +307,10 @@ __decorate([
 ], AuthController.prototype, "signinwithGoogleAgent", null);
 __decorate([
     (0, common_1.Get)('signout'),
-    __param(0, (0, common_1.Res)({ passthrough: true })),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [Object]),
+    __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signout", null);
 __decorate([

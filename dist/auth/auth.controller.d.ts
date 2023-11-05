@@ -39,7 +39,7 @@ export declare class AuthController {
         };
     }>;
     signinwithGoogleAgent(req: request, res: Response): Promise<void>;
-    signout(res: Response): Promise<void>;
+    signout(req: request, res: Response): Promise<void>;
     getProfile(req: any): Promise<{
         Id: string;
         FullName: string;
