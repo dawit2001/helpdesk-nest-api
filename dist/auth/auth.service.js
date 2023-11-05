@@ -58,18 +58,21 @@ let AuthService = exports.AuthService = class AuthService {
         }
     }
     async SignIn({ Email, Password }) {
-        const user = await this.UserService.Login({ Email });
+        let user = await this.UserService.Login({ Email });
+        let AccessToken = null;
+        let RefreshToken = null;
         if (!user) {
             throw new common_1.UnauthorizedException('Email not found.Please enter your valid email !!!');
         }
         if (user.Verified === false)
-            return null;
+            return { user, AccessToken, RefreshToken };
         if (!this.validatePassword(Password, user.Password))
             throw new common_1.UnauthorizedException('Invalid Password');
         const payload = { sub: user.Id, userName: user.UserName };
-        const AccessToken = await this.generateToken(payload);
-        const RefreshToken = await this.generateRefreshToken(payload);
-        return { AccessToken, RefreshToken };
+        AccessToken = await this.generateToken(payload);
+        RefreshToken = await this.generateRefreshToken(payload);
+        user = null;
+        return { user, AccessToken, RefreshToken };
     }
     async validatePassword(Password, HashPassword) {
         return Password.includes(HashPassword);
@@ -93,14 +96,15 @@ let AuthService = exports.AuthService = class AuthService {
     async signInWithGoogle(signupDto) {
         const { Email } = signupDto;
         let user = await this.UserService.Login({ Email });
+        let AccessToken = null;
+        let RefreshToken = null;
+        console.log(user);
         if (user) {
             const payload = { sub: user.Id, userName: user.UserName };
-            const AccessToken = await this.generateToken(payload);
-            const RefreshToken = await this.generateRefreshToken(payload);
-            return { AccessToken, RefreshToken };
+            AccessToken = await this.generateToken(payload);
+            RefreshToken = await this.generateRefreshToken(payload);
         }
-        else
-            return null;
+        return { user, AccessToken, RefreshToken };
     }
     async signInWithGoogleAgent(signupDto) {
         const { Email, UserType } = signupDto;

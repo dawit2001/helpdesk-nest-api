@@ -10,8 +10,34 @@ export declare class AuthController {
     private setAccessTokenCookie;
     signup(req: request, res: Response): Promise<void>;
     verifyEmail(token: string, req: request, res: Response): Promise<void>;
-    signin(req: request, res: Response): Promise<void>;
-    signinwithGoogle(req: request, res: Response): Promise<void>;
+    signin(req: request, res: Response): Promise<{
+        User: {
+            Id: string;
+            FullName: string;
+            Email: string;
+            UserName: string;
+            UserType: string;
+            Image: string;
+            WorkingPhone: string;
+            MobilePhone: string;
+            Verified: boolean;
+        };
+        AccessToken: string;
+        RefreshToken: string;
+    }>;
+    signinwithGoogle(req: request, res: Response): Promise<{
+        User: {
+            Id: string;
+            FullName: string;
+            Email: string;
+            UserName: string;
+            UserType: string;
+            Image: string;
+            WorkingPhone: string;
+            MobilePhone: string;
+            Verified: boolean;
+        };
+    }>;
     signinwithGoogleAgent(req: request, res: Response): Promise<void>;
     signout(res: Response): Promise<void>;
     getProfile(req: any): Promise<{

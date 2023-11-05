@@ -11,6 +11,20 @@ export declare class AuthService {
     validateToken(token: string): any;
     verifyEmailtoken(token: string): any;
     SignIn({ Email, Password }: SignInDto): Promise<{
+        user: {
+            Id: string;
+            FullName: string;
+            UserName: string;
+            Email: string;
+            Password: string;
+            Image: string;
+            UserType: string;
+            About: string;
+            CreatedDate: Date;
+            WorkingPhone: string;
+            MobilePhone: string;
+            Verified: boolean;
+        };
         AccessToken: string;
         RefreshToken: string;
     }>;
@@ -44,6 +58,20 @@ export declare class AuthService {
         Verified: boolean;
     }>;
     signInWithGoogle(signupDto: SignUpDto): Promise<{
+        user: {
+            Id: string;
+            FullName: string;
+            UserName: string;
+            Email: string;
+            Password: string;
+            Image: string;
+            UserType: string;
+            About: string;
+            CreatedDate: Date;
+            WorkingPhone: string;
+            MobilePhone: string;
+            Verified: boolean;
+        };
         AccessToken: string;
         RefreshToken: string;
     }>;
