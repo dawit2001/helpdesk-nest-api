@@ -228,7 +228,7 @@ let AuthController = exports.AuthController = class AuthController {
     async getProfile(req) {
         const { userId } = req.user;
         console.log(req.user);
-        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(userId);
+        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(req.user.userId);
         console.log(Id);
         return {
             Id,

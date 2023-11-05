@@ -309,7 +309,7 @@ export class AuthController {
       WorkingPhone,
       MobilePhone,
       Verified,
-    } = await this.authService.UserProfile(userId);
+    } = await this.authService.UserProfile(req.user.userId);
     console.log(Id);
 
     return {
