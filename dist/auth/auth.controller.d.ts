@@ -41,7 +41,7 @@ export declare class AuthController {
     }>;
     signinwithGoogleAgent(req: request, res: Response): Promise<void>;
     signout(req: request, res: Response): Promise<void>;
-    getProfile(req: request): Promise<{
+    getProfile(req: any): Promise<{
         Id: string;
         FullName: string;
         Email: string;

@@ -296,8 +296,10 @@ export class AuthController {
 
   @UseGuards(JWTGuard)
   @Get('profile')
-  async getProfile(@Req() req: request) {
-    console.log(req.body);
+  async getProfile(@Req() req) {
+    const { userId } = req.user;
+    console.log(req.user);
+
     const {
       Id,
       FullName,
@@ -308,7 +310,7 @@ export class AuthController {
       WorkingPhone,
       MobilePhone,
       Verified,
-    } = await this.authService.UserProfile(req.body.Id);
+    } = await this.authService.UserProfile({ userId });
 
     return {
       Id,
@@ -340,7 +342,7 @@ export class AuthController {
       if (!decodedToken || this.isTokenExpired(decodedToken.exp))
         throw new UnauthorizedException('User not authorized...');
       const userId = decodedToken.sub;
-      const user = await this.authService.UserProfile(userId);
+      const user = await this.authService.UserProfile({ userId });
       if (!user) throw new UnauthorizedException('User not authorized...');
       const payload = { sub: user.Id, username: user.UserName };
       const AccessToken = await this.authService.generateToken(payload);
