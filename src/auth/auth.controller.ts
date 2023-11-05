@@ -58,14 +58,14 @@ export class AuthController {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      expires: new Date(Date.now() + 15 * 60 * 1000),
+      expires: new Date(0),
       path: '/',
     });
     res.cookie('refresh_token', '', {
       httpOnly: true,
       secure: true,
       sameSite: 'none',
-      expires: new Date(Date.now() + 2 * 30 * 24 * 60 * 60 * 1000),
+      expires: new Date(0),
       path: '/',
     });
   };
@@ -308,7 +308,7 @@ export class AuthController {
       WorkingPhone,
       MobilePhone,
       Verified,
-    } = await this.authService.UserProfile({ userId });
+    } = await this.authService.UserProfile(userId);
 
     return {
       Id,
