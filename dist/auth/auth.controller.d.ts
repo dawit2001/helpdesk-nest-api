@@ -8,6 +8,7 @@ export declare class AuthController {
     private readonly socketGateway;
     constructor(authService: AuthService, emailService: EmailService, socketGateway: SocketGateway);
     private setAccessTokenCookie;
+    private removeAccessToken;
     signup(req: request, res: Response): Promise<void>;
     verifyEmail(token: string, req: request, res: Response): Promise<void>;
     signin(req: request, res: Response): Promise<{

@@ -43,6 +43,22 @@ let AuthController = exports.AuthController = class AuthController {
                 path: '/',
             });
         };
+        this.removeAccessToken = (res) => {
+            res.cookie('access_token', '', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 15 * 60 * 1000),
+                path: '/',
+            });
+            res.cookie('refresh_token', '', {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'none',
+                expires: new Date(Date.now() + 2 * 30 * 24 * 60 * 60 * 1000),
+                path: '/',
+            });
+        };
     }
     async signup(req, res) {
         res.clearCookie('access_token');
@@ -206,6 +222,7 @@ let AuthController = exports.AuthController = class AuthController {
         console.log(req.cookies['access_token']);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
+        this.removeAccessToken(res);
         res.send('user logged out');
     }
     async getProfile(req) {
