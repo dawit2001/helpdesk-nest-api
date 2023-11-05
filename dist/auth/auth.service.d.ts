@@ -79,7 +79,7 @@ export declare class AuthService {
         AccessToken: string;
         RefreshToken: string;
     }>;
-    UserProfile(Id: string): Promise<{
+    UserProfile(userId: any): Promise<{
         Id: string;
         FullName: string;
         UserName: string;

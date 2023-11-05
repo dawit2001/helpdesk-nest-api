@@ -116,8 +116,8 @@ let AuthService = exports.AuthService = class AuthService {
         const RefreshToken = await this.generateRefreshToken(payload);
         return { AccessToken, RefreshToken };
     }
-    async UserProfile(Id) {
-        console.log(Id);
+    async UserProfile(userId) {
+        const { userId: Id } = { userId };
         const user = await this.UserService.User({ Id });
         return user;
     }
