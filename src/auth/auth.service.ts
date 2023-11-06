@@ -98,7 +98,6 @@ export class AuthService {
     let user = await this.UserService.Login({ Email });
     let AccessToken: string = null;
     let RefreshToken: string = null;
-    console.log(user);
     if (user) {
       const payload = { sub: user.Id, userName: user.UserName };
       AccessToken = await this.generateToken(payload);
@@ -117,12 +116,8 @@ export class AuthService {
 
     return { AccessToken, RefreshToken };
   }
-  async UserProfile(userId: any) {
-    const { userId: Id } = userId;
-    console.log(Id);
-
+  async UserProfile(Id: string) {
     const user = await this.UserService.User({ Id });
-    console.log(user);
     return user;
   }
 }

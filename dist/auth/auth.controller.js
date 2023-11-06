@@ -97,7 +97,6 @@ let AuthController = exports.AuthController = class AuthController {
             const isTokenExpired = this.isTokenExpired(decodedToken.exp);
             if (isTokenExpired)
                 throw new unauthorized_exception_1.PasswordUpdateException('Token expired...');
-            console.log(decodedToken);
             const user = await this.authService.verifyedUser(decodedToken.sub);
             const payload = { sub: user.Id, userName: user.UserName };
             const AccessToken = await this.authService.generateToken(payload);
@@ -152,9 +151,7 @@ let AuthController = exports.AuthController = class AuthController {
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
         const { user, AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
-        console.log(user);
         if (!user) {
-            console.log('user not found');
             const EmailToken = await this.authService.generateEmailToken({
                 sub: req.body.Id,
                 username: req.body.UserName,
@@ -181,7 +178,6 @@ let AuthController = exports.AuthController = class AuthController {
             }
         }
         if (user && !user.Verified) {
-            console.log(user);
             const EmailToken = await this.authService.generateEmailToken({
                 sub: user.Id,
                 username: user.UserName,
@@ -219,7 +215,6 @@ let AuthController = exports.AuthController = class AuthController {
         res.send({ status: 'ok' });
     }
     async signout(req, res) {
-        console.log(req.cookies['access_token']);
         res.clearCookie('access_token');
         res.clearCookie('refresh_token');
         this.removeAccessToken(res);
@@ -227,9 +222,7 @@ let AuthController = exports.AuthController = class AuthController {
     }
     async getProfile(req) {
         const { userId } = req.user;
-        console.log(req.user);
-        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(req.user.userId);
-        console.log(Id);
+        const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = await this.authService.UserProfile(userId);
         return {
             Id,
             FullName,
@@ -255,6 +248,8 @@ let AuthController = exports.AuthController = class AuthController {
                 throw new common_1.UnauthorizedException('User not authorized...');
             const userId = decodedToken.sub;
             const user = await this.authService.UserProfile(userId);
+            console.log(userId);
+            console.log(user);
             if (!user)
                 throw new common_1.UnauthorizedException('User not authorized...');
             const payload = { sub: user.Id, username: user.UserName };
