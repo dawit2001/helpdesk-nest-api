@@ -13,7 +13,19 @@ exports.SocketGateway = void 0;
 const websockets_1 = require("@nestjs/websockets");
 const socket_io_1 = require("socket.io");
 let SocketGateway = exports.SocketGateway = class SocketGateway {
-    async emailConfirmed(client, userId, AccessToken, RefreshToken) {
+    handleConnection(client, ...args) {
+        this.client = client;
+    }
+    handleDisconnect(client) { }
+    async emailConfirmed(client) {
+        client.emit('emailConfirmed', 'email confirmed');
+        console.log(client.connected);
+        client.disconnect(true);
+    }
+    async setCookie(client, data) {
+        console.log(client.connected);
+        console.log(data);
+        client.handshake.headers.cookie = ``;
         client.disconnect(true);
     }
 };
@@ -24,9 +36,15 @@ __decorate([
 __decorate([
     (0, websockets_1.SubscribeMessage)('emailConfirmed'),
     __metadata("design:type", Function),
-    __metadata("design:paramtypes", [socket_io_1.Socket, String, String, String]),
+    __metadata("design:paramtypes", [socket_io_1.Socket]),
     __metadata("design:returntype", Promise)
 ], SocketGateway.prototype, "emailConfirmed", null);
+__decorate([
+    (0, websockets_1.SubscribeMessage)('setCookie'),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [socket_io_1.Socket, Object]),
+    __metadata("design:returntype", Promise)
+], SocketGateway.prototype, "setCookie", null);
 exports.SocketGateway = SocketGateway = __decorate([
     (0, websockets_1.WebSocketGateway)({
         cors: {

@@ -53,5 +53,6 @@ export declare class AuthController {
         Verified: boolean;
     }>;
     private isTokenExpired;
+    setCookie(req: request, res: Response): Promise<void>;
     refreshAccessToken(req: request, res: Response): Promise<void>;
 }

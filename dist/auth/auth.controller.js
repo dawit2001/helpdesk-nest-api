@@ -61,8 +61,7 @@ let AuthController = exports.AuthController = class AuthController {
         };
     }
     async signup(req, res) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        this.removeAccessToken(res);
         const EmailToken = await this.authService.generateEmailToken({
             sub: req.body.Id,
             username: req.body.UserName,
@@ -89,8 +88,7 @@ let AuthController = exports.AuthController = class AuthController {
     }
     async verifyEmail(token, req, res) {
         try {
-            res.clearCookie('access_token');
-            res.clearCookie('refresh_token');
+            this.removeAccessToken(res);
             const decodedToken = await this.authService.verifyEmailtoken(token);
             if (!decodedToken)
                 throw new unauthorized_exception_1.PasswordUpdateException('Invalid token...');
@@ -101,11 +99,10 @@ let AuthController = exports.AuthController = class AuthController {
             const payload = { sub: user.Id, userName: user.UserName };
             const AccessToken = await this.authService.generateToken(payload);
             const RefreshToken = await this.authService.generateRefreshToken(payload);
-            this.socketGateway.server.emit('emailConfirmed', [
-                user.Id,
+            this.socketGateway.server.emit('setCookie', {
                 AccessToken,
                 RefreshToken,
-            ]);
+            });
             this.setAccessTokenCookie(res, AccessToken, RefreshToken);
             res.redirect(`${api}`);
         }
@@ -114,8 +111,7 @@ let AuthController = exports.AuthController = class AuthController {
         }
     }
     async signin(req, res) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        this.removeAccessToken(res);
         const { user, AccessToken, RefreshToken } = await this.authService.SignIn(req.body);
         if (user) {
             const EmailToken = await this.authService.generateEmailToken({
@@ -148,8 +144,7 @@ let AuthController = exports.AuthController = class AuthController {
         }
     }
     async signinwithGoogle(req, res) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        this.removeAccessToken(res);
         const { user, AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
         if (!user) {
             const EmailToken = await this.authService.generateEmailToken({
@@ -208,15 +203,12 @@ let AuthController = exports.AuthController = class AuthController {
         }
     }
     async signinwithGoogleAgent(req, res) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
+        this.removeAccessToken(res);
         const { AccessToken, RefreshToken } = await this.authService.signInWithGoogleAgent(req.body);
         this.setAccessTokenCookie(res, AccessToken, RefreshToken);
         res.send({ status: 'ok' });
     }
     async signout(req, res) {
-        res.clearCookie('access_token');
-        res.clearCookie('refresh_token');
         this.removeAccessToken(res);
         res.send('user logged out');
     }
@@ -239,6 +231,12 @@ let AuthController = exports.AuthController = class AuthController {
         const now = Date.now() / 1000;
         return now >= expirationTimestamp;
     }
+    async setCookie(req, res) {
+        const { AccessToken, RefreshToken } = req.body;
+        console.log(req.body);
+        this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+        res.status(200).send('email confirmed');
+    }
     async refreshAccessToken(req, res) {
         if (!req.cookies['refresh_token'])
             throw new common_1.UnauthorizedException('User not authorized...');
@@ -248,8 +246,6 @@ let AuthController = exports.AuthController = class AuthController {
                 throw new common_1.UnauthorizedException('User not authorized...');
             const userId = decodedToken.sub;
             const user = await this.authService.UserProfile(userId);
-            console.log(userId);
-            console.log(user);
             if (!user)
                 throw new common_1.UnauthorizedException('User not authorized...');
             const payload = { sub: user.Id, username: user.UserName };
@@ -335,6 +331,14 @@ __decorate([
     __metadata("design:paramtypes", [Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "getProfile", null);
+__decorate([
+    (0, common_1.Post)('setCookie'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "setCookie", null);
 __decorate([
     (0, common_1.Post)('refresh'),
     __param(0, (0, common_1.Req)()),
