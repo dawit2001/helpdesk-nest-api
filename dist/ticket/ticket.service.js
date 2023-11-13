@@ -16,6 +16,13 @@ let TicketService = exports.TicketService = class TicketService {
     constructor(prisma) {
         this.prisma = prisma;
     }
+    async getAllTickets() {
+        return await this.prisma.tickets.findMany({
+            orderBy: {
+                CreatedAt: 'desc',
+            },
+        });
+    }
     async getTicket(Id) {
         return await this.prisma.tickets.findUnique({
             where: {
@@ -50,6 +57,10 @@ let TicketService = exports.TicketService = class TicketService {
         });
         return Ticket;
     }
+    async newEmailTicket(data) {
+        console.log(data);
+        return;
+    }
     async fetchSingleAttachment(Id) {
         return await this.prisma.attachement.findMany({
             where: {
@@ -62,6 +73,7 @@ let TicketService = exports.TicketService = class TicketService {
         return Attachement;
     }
     async newAttachment(data) {
+        console.log(data);
         const Attachment = await this.prisma.attachement.create({
             data,
         });

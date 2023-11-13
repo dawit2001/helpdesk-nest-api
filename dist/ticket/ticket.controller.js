@@ -16,11 +16,25 @@ exports.TicketController = void 0;
 const common_1 = require("@nestjs/common");
 const ticket_service_1 = require("./ticket.service");
 const Ticket_dto_1 = require("./Ticket.dto");
+const user_service_1 = require("../user/user.service");
 let TicketController = exports.TicketController = class TicketController {
-    constructor(TicketService) {
+    constructor(TicketService, UserService) {
         this.TicketService = TicketService;
+        this.UserService = UserService;
     }
-    async getTicket(TicketId) {
+    async getAllTickets() {
+        const Tickets = await this.TicketService.getAllTickets();
+        const Ticket = Tickets.map(async (ticket) => {
+            const user = ticket.UserId && (await this.UserService.contact(ticket.UserId));
+            if (user)
+                return { Ticket: ticket, Contact: user };
+            else
+                return { Ticket: ticket, Contact: ticket.Email };
+        });
+        console.log(await Promise.all(Ticket));
+        return await Promise.all(Ticket);
+    }
+    async getUserTicket(TicketId) {
         const Ticket = await this.TicketService.getTicket(TicketId);
         if (Ticket) {
             const { Id, Type, Priority, Subject, Content, UserId, Status, CreatedAt, UpdatedAt, } = Ticket;
@@ -41,7 +55,6 @@ let TicketController = exports.TicketController = class TicketController {
     }
     async getTickets(userId, offset, limit) {
         const { Tickets, count } = await this.TicketService.getUserTickets(userId, parseInt(offset), parseInt(limit));
-        console.log(Tickets);
         const Ticket = Tickets.map((ticket) => {
             const { Id, Type, Priority, Subject, Content, UserId, CreatedAt, UpdatedAt, Status, } = ticket;
             const tickets = {
@@ -169,12 +182,18 @@ let TicketController = exports.TicketController = class TicketController {
     }
 };
 __decorate([
+    (0, common_1.Get)(),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", []),
+    __metadata("design:returntype", Promise)
+], TicketController.prototype, "getAllTickets", null);
+__decorate([
     (0, common_1.Get)(':Id'),
     __param(0, (0, common_1.Param)('Id')),
     __metadata("design:type", Function),
     __metadata("design:paramtypes", [String]),
     __metadata("design:returntype", Promise)
-], TicketController.prototype, "getTicket", null);
+], TicketController.prototype, "getUserTicket", null);
 __decorate([
     (0, common_1.Get)('/user/:id'),
     __param(0, (0, common_1.Param)('id')),
@@ -235,6 +254,7 @@ __decorate([
 ], TicketController.prototype, "DeleteTicket", null);
 exports.TicketController = TicketController = __decorate([
     (0, common_1.Controller)('ticket'),
-    __metadata("design:paramtypes", [ticket_service_1.TicketService])
+    __metadata("design:paramtypes", [ticket_service_1.TicketService,
+        user_service_1.UserService])
 ], TicketController);
 //# sourceMappingURL=ticket.controller.js.map

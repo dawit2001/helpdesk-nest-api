@@ -11,11 +11,12 @@ const common_1 = require("@nestjs/common");
 const ticket_service_1 = require("./ticket.service");
 const ticket_controller_1 = require("./ticket.controller");
 const prisma_service_1 = require("../prisma/prisma.service");
+const user_service_1 = require("../user/user.service");
 let TicketModule = exports.TicketModule = class TicketModule {
 };
 exports.TicketModule = TicketModule = __decorate([
     (0, common_1.Module)({
-        providers: [ticket_service_1.TicketService, prisma_service_1.PrismaService],
+        providers: [ticket_service_1.TicketService, prisma_service_1.PrismaService, user_service_1.UserService],
         controllers: [ticket_controller_1.TicketController],
     })
 ], TicketModule);

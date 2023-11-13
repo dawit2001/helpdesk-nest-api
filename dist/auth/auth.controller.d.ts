@@ -26,6 +26,7 @@ export declare class AuthController {
         AccessToken: string;
         RefreshToken: string;
     }>;
+    agentSignin(req: request, res: Response): Promise<void>;
     signinwithGoogle(req: request, res: Response): Promise<{
         User: {
             Id: string;

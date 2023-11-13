@@ -28,6 +28,10 @@ export declare class AuthService {
         AccessToken: string;
         RefreshToken: string;
     }>;
+    agentSignin({ Email, Password }: SignInDto): Promise<{
+        AccessToken: string;
+        RefreshToken: string;
+    }>;
     private validatePassword;
     SignUp(signUpDto: SignUpDto): Promise<{
         Id: string;

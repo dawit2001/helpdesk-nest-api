@@ -1,9 +1,63 @@
 import { TicketService } from './ticket.service';
 import { AttachmentDto, newTicketDto } from './Ticket.dto';
+import { UserService } from 'src/user/user.service';
 export declare class TicketController {
     private readonly TicketService;
-    constructor(TicketService: TicketService);
-    getTicket(TicketId: string): Promise<{
+    private readonly UserService;
+    constructor(TicketService: TicketService, UserService: UserService);
+    getAllTickets(): Promise<({
+        Ticket: {
+            Id: string;
+            UserId: string;
+            Type: string;
+            ReportedVia: string;
+            Email: string;
+            Priority: string;
+            Subject: string;
+            Content: string;
+            Status: string;
+            Note: string;
+            DepartmentId: string;
+            FirstResponseDue: Date;
+            ResolutionDue: Date;
+            CreatedAt: Date;
+            UpdatedAt: Date;
+        };
+        Contact: {
+            Id: string;
+            FullName: string;
+            UserName: string;
+            Email: string;
+            Password: string;
+            Image: string;
+            UserType: string;
+            About: string;
+            CreatedDate: Date;
+            WorkingPhone: string;
+            MobilePhone: string;
+            Verified: boolean;
+        };
+    } | {
+        Ticket: {
+            Id: string;
+            UserId: string;
+            Type: string;
+            ReportedVia: string;
+            Email: string;
+            Priority: string;
+            Subject: string;
+            Content: string;
+            Status: string;
+            Note: string;
+            DepartmentId: string;
+            FirstResponseDue: Date;
+            ResolutionDue: Date;
+            CreatedAt: Date;
+            UpdatedAt: Date;
+        };
+        Contact: string;
+    })[]>;
+    getUserTicket(TicketId: string): Promise<{
         Id: string;
         Type: string;
         Priority: string;

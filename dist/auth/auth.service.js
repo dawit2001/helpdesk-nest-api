@@ -74,6 +74,20 @@ let AuthService = exports.AuthService = class AuthService {
         user = null;
         return { user, AccessToken, RefreshToken };
     }
+    async agentSignin({ Email, Password }) {
+        let user = await this.UserService.Login({ Email });
+        let AccessToken = null;
+        let RefreshToken = null;
+        if (!user) {
+            throw new common_1.UnauthorizedException('Email not found.Please enter your valid email !!!');
+        }
+        if (!this.validatePassword(Password, user.Password))
+            throw new common_1.UnauthorizedException('Invalid Password');
+        const payload = { sub: user.Id, userName: user.UserName };
+        AccessToken = await this.generateToken(payload);
+        RefreshToken = await this.generateRefreshToken(payload);
+        return { AccessToken, RefreshToken };
+    }
     async validatePassword(Password, HashPassword) {
         return Password.includes(HashPassword);
     }

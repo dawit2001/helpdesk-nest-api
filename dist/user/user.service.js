@@ -29,6 +29,18 @@ let UserService = exports.UserService = class UserService {
         });
         return user;
     }
+    async contact(Id) {
+        const user = await this.Prisma.users.findUnique({
+            where: {
+                Id,
+            },
+        });
+        return user;
+    }
+    async EmailUser(data) {
+        const user = await this.Prisma.users.create({ data });
+        return user;
+    }
     async LoginAgent(where) {
         const user = await this.Prisma.users.findUnique({
             where: where,
@@ -36,6 +48,7 @@ let UserService = exports.UserService = class UserService {
         return user;
     }
     async Login({ Email }) {
+        console.log(Email);
         const user = await this.Prisma.users.findUnique({
             where: {
                 Email,

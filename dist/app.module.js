@@ -25,6 +25,12 @@ const email_service_1 = require("./email/email.service");
 const email_module_1 = require("./email/email.module");
 const socket_gateway_1 = require("./socket/socket.gateway");
 const socket_module_1 = require("./socket/socket.module");
+const firebase_module_1 = require("./firebase/firebase.module");
+const firebase_service_1 = require("./firebase/firebase.service");
+const config_1 = require("@nestjs/config");
+const imap_service_1 = require("./imap/imap.service");
+const imap_module_1 = require("./imap/imap.module");
+const ticket_service_1 = require("./ticket/ticket.service");
 let AppModule = exports.AppModule = class AppModule {
     configure(consumer) { }
 };
@@ -38,6 +44,14 @@ exports.AppModule = AppModule = __decorate([
             search_module_1.SearchModule,
             email_module_1.EmailModule,
             socket_module_1.SocketModule,
+            firebase_module_1.FirebaseModule,
+            imap_module_1.ImapModule,
+            ticket_module_1.TicketModule,
+            config_1.ConfigModule.forRoot({
+                isGlobal: true,
+                load: [() => require('./imap/email.config')],
+            }),
+            imap_module_1.ImapModule,
         ],
         controllers: [app_controller_1.AppController, user_controller_1.UserController, auth_controller_1.AuthController],
         providers: [
@@ -48,6 +62,10 @@ exports.AppModule = AppModule = __decorate([
             search_service_1.SearchService,
             email_service_1.EmailService,
             socket_gateway_1.SocketGateway,
+            firebase_service_1.FirebaseService,
+            config_1.ConfigService,
+            imap_service_1.ImapService,
+            ticket_service_1.TicketService,
         ],
     })
 ], AppModule);

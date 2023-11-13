@@ -22,6 +22,7 @@ const email_service_1 = require("../email/email.service");
 const email_module_1 = require("../email/email.module");
 const socket_module_1 = require("../socket/socket.module");
 const socket_gateway_1 = require("../socket/socket.gateway");
+const config_1 = require("@nestjs/config");
 let AuthModule = exports.AuthModule = class AuthModule {
 };
 exports.AuthModule = AuthModule = __decorate([
@@ -46,6 +47,7 @@ exports.AuthModule = AuthModule = __decorate([
             email_service_1.EmailService,
             jwt_1.JwtService,
             socket_gateway_1.SocketGateway,
+            config_1.ConfigService,
         ],
         controllers: [auth_controller_1.AuthController, user_controller_1.UserController],
     })

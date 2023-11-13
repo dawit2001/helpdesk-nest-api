@@ -20,10 +20,11 @@ let UserController = exports.UserController = class UserController {
     constructor(UserService) {
         this.UserService = UserService;
     }
-    async updateProfile(userId, updateUserDto) {
-        const user = await this.UserService.updateUser(userId, updateUserDto);
+    async getUser(userId) {
+        const user = await this.UserService.contact(userId);
+        console.log(user);
         if (user) {
-            const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, } = user;
+            const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, Verified, } = user;
             return {
                 Id,
                 FullName,
@@ -33,6 +34,24 @@ let UserController = exports.UserController = class UserController {
                 UserType,
                 WorkingPhone,
                 MobilePhone,
+                Verified,
+            };
+        }
+    }
+    async updateProfile(userId, updateUserDto) {
+        const user = await this.UserService.updateUser(userId, updateUserDto);
+        if (user) {
+            const { Id, FullName, Email, UserName, Image, UserType, WorkingPhone, MobilePhone, Verified, } = user;
+            return {
+                Id,
+                FullName,
+                Email,
+                UserName,
+                Image,
+                UserType,
+                WorkingPhone,
+                MobilePhone,
+                Verified,
             };
         }
     }
@@ -51,6 +70,13 @@ let UserController = exports.UserController = class UserController {
         };
     }
 };
+__decorate([
+    (0, common_1.Get)(':id'),
+    __param(0, (0, common_1.Param)('id')),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [String]),
+    __metadata("design:returntype", Promise)
+], UserController.prototype, "getUser", null);
 __decorate([
     (0, common_1.Put)('update/:id'),
     __param(0, (0, common_1.Param)('id')),

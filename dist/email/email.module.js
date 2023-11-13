@@ -17,6 +17,7 @@ const prisma_service_1 = require("../prisma/prisma.service");
 const mailer_1 = require("@nestjs-modules/mailer");
 const handlebars_adapter_1 = require("@nestjs-modules/mailer/dist/adapters/handlebars.adapter");
 const path_1 = require("path");
+const config_1 = require("@nestjs/config");
 console.log(process.env.NEST_ENV);
 let EmailModule = exports.EmailModule = class EmailModule {
 };
@@ -50,6 +51,7 @@ exports.EmailModule = EmailModule = __decorate([
             email_service_1.EmailService,
             user_service_1.UserService,
             prisma_service_1.PrismaService,
+            config_1.ConfigService,
         ],
         controllers: [email_controller_1.EmailController],
         exports: [email_service_1.EmailService],

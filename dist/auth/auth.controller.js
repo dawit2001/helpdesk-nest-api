@@ -143,6 +143,15 @@ let AuthController = exports.AuthController = class AuthController {
             res.send('successfully loggedin');
         }
     }
+    async agentSignin(req, res) {
+        console.log(req.body);
+        this.removeAccessToken(res);
+        const { AccessToken, RefreshToken } = await this.authService.agentSignin(req.body);
+        if (AccessToken && RefreshToken) {
+            this.setAccessTokenCookie(res, AccessToken, RefreshToken);
+            res.send({ AccessToken, RefreshToken });
+        }
+    }
     async signinwithGoogle(req, res) {
         this.removeAccessToken(res);
         const { user, AccessToken, RefreshToken } = await this.authService.signInWithGoogle(req.body);
@@ -257,7 +266,7 @@ let AuthController = exports.AuthController = class AuthController {
                 expires: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000),
                 path: '/',
             });
-            const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, } = user;
+            const { Id, FullName, Email, UserName, UserType, Image, WorkingPhone, MobilePhone, Verified, } = user;
             res.send({
                 Id,
                 FullName,
@@ -267,6 +276,7 @@ let AuthController = exports.AuthController = class AuthController {
                 Image,
                 WorkingPhone,
                 MobilePhone,
+                Verified,
             });
         }
         catch (e) {
@@ -299,6 +309,14 @@ __decorate([
     __metadata("design:paramtypes", [Object, Object]),
     __metadata("design:returntype", Promise)
 ], AuthController.prototype, "signin", null);
+__decorate([
+    (0, common_1.Post)('agent/signin'),
+    __param(0, (0, common_1.Req)()),
+    __param(1, (0, common_1.Res)({ passthrough: true })),
+    __metadata("design:type", Function),
+    __metadata("design:paramtypes", [Object, Object]),
+    __metadata("design:returntype", Promise)
+], AuthController.prototype, "agentSignin", null);
 __decorate([
     (0, common_1.Post)('googleAuth'),
     __param(0, (0, common_1.Req)()),
